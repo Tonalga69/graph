@@ -1,10 +1,23 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Examen mamalon!");
+
+
+        ArrayList<Edge> graph1 = new ArrayList<Edge>(
+              List.of(
+                      new Edge(3, new Node("A"), new Node("B")),
+                      new Edge(2, new Node("B"), new Node("C")),
+                      new Edge(1, new Node("C"), new Node("D")),
+                      new Edge(4, new Node("D"), new Node("E")),
+                      new Edge(5, new Node("E"), new Node("A")),
+                      new Edge(6, new Node("A"), new Node("C"))
+              )
+        );
         boolean[][] matriz1 ={
                 {false, false, true, false, false},
                 {false, true, false, true, false},
