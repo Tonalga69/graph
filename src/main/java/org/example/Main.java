@@ -1,107 +1,76 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Examen mamalon!");
+        System.out.println("Buscador de nodos!");
+        String startNode = "A";
+        String endNode = "E";
 
-
-        ArrayList<Edge> graph1 = new ArrayList<Edge>(
-              List.of(
-                      new Edge(3, new Node("A"), new Node("B")),
-                      new Edge(2, new Node("B"), new Node("C")),
-                      new Edge(1, new Node("C"), new Node("D")),
-                      new Edge(4, new Node("D"), new Node("E")),
-                      new Edge(5, new Node("E"), new Node("A")),
-                      new Edge(6, new Node("A"), new Node("C"))
-              )
+        Map<String, Node> nodes = Map.of(
+                "A", new Node("A"),
+                "B", new Node("B"),
+                "C", new Node("C"),
+                "D", new Node("D"),
+                "E", new Node("E"),
+                "F", new Node("F")
         );
-        boolean[][] matriz1 ={
-                {false, false, true, false, false},
-                {false, true, false, true, false},
-                {true, false, true, true, true},
-                {false, true, true, false, false},
-                {false, false, true, false, false}
-        };
+        nodes.get("A").addEdge(new Edge(1, nodes.get("B")));
+        nodes.get("A").addEdge(new Edge(6, nodes.get("C")));
+        nodes.get("A").addEdge(new Edge(3, nodes.get("D")));
+        nodes.get("B").addEdge(new Edge(8, nodes.get("E")));
+        nodes.get("B").addEdge(new Edge(9, nodes.get("F")));
+        nodes.get("B").addEdge(new Edge(4, nodes.get("C")));
+        nodes.get("C").addEdge(new Edge(2, nodes.get("D")));
+        nodes.get("C").addEdge(new Edge(12, nodes.get("E")));
+        nodes.get("E").addEdge(new Edge(1, nodes.get("F")));
 
-        boolean[][] matriz2={
-                {true, false, false, true, false},
-                {false, true, true, true, false},
-                {false, true, true, false, true},
-                {true, true, false, false,  false},
-                {false, false, true, false, false}
-        };
+        nodes.get(startNode).weight = 0;
+        String smallestNodeName = startNode;
 
-        boolean[][] matriz3={
-                {false, true, false,false, false},
-                {true, true, true, true, true},
-                {false, true, false, true, false},
-                {false, true, true, false, false},
-                {false, true, false, false, true}
+        while (true) {
+           final boolean res=calculateNodesWeight(nodes, smallestNodeName, endNode);
+           if(res){
+               break;
+           }
+           smallestNodeName =getSmallestNodeNotVisited(nodes).name;
+        }
 
-        };
-
-        boolean[][] matriz4={
-                {true, true, false, false, false},
-                {true, true, false, true, true},
-                {false, false, false, false, true},
-                {false, true, false, true, false},
-                {false, true, true, false, false}
-        };
-
-        boolean[][] matriz5={
-                {false, true, false, false, false},
-                {true, false, false, true, true},
-                {false, false, true, false, true},
-                {false, false, false, true, true},
-                {false, true, true, true, false}
-        };
-        System.out.println("Matriz 1");
-        ArrayList<ArrayList<Boolean>> matrizDinamica1 = convertirAMatrizDinamica(matriz1);
-        imprimirMatriz(matrizDinamica1);
-        System.out.println("Matriz 2");
-        ArrayList<ArrayList<Boolean>> matrizDinamica2 = convertirAMatrizDinamica(matriz2);
-        imprimirMatriz(matrizDinamica2);
-        System.out.println("Matriz 3");
-        ArrayList<ArrayList<Boolean>> matrizDinamica3 = convertirAMatrizDinamica(matriz3);
-        imprimirMatriz(matrizDinamica3);
-        System.out.println("Matriz 4");
-        ArrayList<ArrayList<Boolean>> matrizDinamica4 = convertirAMatrizDinamica(matriz4);
-        imprimirMatriz(matrizDinamica4);
-        System.out.println("Matriz 5");
-        ArrayList<ArrayList<Boolean>> matrizDinamica5 = convertirAMatrizDinamica(matriz5);
-        imprimirMatriz(matrizDinamica5);
-
-
+        printPath(nodes, endNode);
 
     }
 
-    public static ArrayList<ArrayList<Boolean>> convertirAMatrizDinamica(boolean[][] matrizEstatica) {
-        ArrayList<ArrayList<Boolean>> matrizDinamica = new ArrayList<>();
-        for (int i = 0; i < matrizEstatica.length; i++) {
-            matrizDinamica.add(new ArrayList<>());
-            for (int j = 0; j < matrizEstatica[i].length; j++) {
-                matrizDinamica.get(i).add(matrizEstatica[i][j]);
+    static  boolean calculateNodesWeight(Map<String, Node> nodes, String startNode, String endNode) {
+        if(startNode.equals(endNode)) {
+            return true;
+        }
+        nodes.get(startNode).setVisited(true);
+        nodes.get(startNode).calculateNodesWeight();
+        return false;
+    }
+
+    static Node getSmallestNodeNotVisited(Map<String, Node> nodes) {
+        Node smallestNode = null;
+        Integer smallestWeight = Integer.MAX_VALUE;
+        for (Node node : nodes.values()) {
+            if (!node.isVisited() && (smallestNode == null || node.weight < smallestWeight)) {
+                smallestNode = node;
+                smallestWeight = node.weight;
             }
         }
-        return matrizDinamica;
+        return smallestNode;
     }
 
-    public static void imprimirMatriz(ArrayList<ArrayList<Boolean>> matriz) {
-        for (int i = 0; i < matriz.size(); i++) {
-            System.out.print(i + " ");
-            for (int j = 0; j < matriz.get(i).size(); j++) {
-                System.out.print(matriz.get(i).get(j) ? "true" : "false");
-                if (j < matriz.get(i).size() - 1) {
-                    System.out.print(", ");
-                }
-            }
-            System.out.println();
+    static void printPath(Map<String, Node> nodes, String endNode) {
+        Node node = nodes.get(endNode);
+        System.out.println("El peso total es: " + node.weight);
+        System.out.println("El camino más corto es: ");
+        while (node != null) {
+            System.out.println(node.name + " -> ");
+            node = node.previousNode;
         }
     }
-
 
 
 

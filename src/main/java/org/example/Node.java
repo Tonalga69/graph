@@ -11,10 +11,12 @@ public class Node {
 
     public Node(String name) {
         this.visited = false;
-        this.weight = 1000;
+        this.weight =Integer.MAX_VALUE;
         this.previousNode = null;
         this.name = name;
     }
+
+
 
     void addEdge(Edge edge) {
         edges.add(edge);
