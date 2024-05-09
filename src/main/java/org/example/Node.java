@@ -3,15 +3,15 @@ package org.example;
 import java.util.ArrayList;
 
 public class Node {
-    Integer weight;
+    Integer value;
     Node previousNode;
     String name;
     private boolean visited;
-    private ArrayList<Edge> edges = new ArrayList<Edge>();
+    private final ArrayList<Edge> edges = new ArrayList<>();
 
     public Node(String name) {
         this.visited = false;
-        this.weight =Integer.MAX_VALUE;
+        this.value =Integer.MAX_VALUE;
         this.previousNode = null;
         this.name = name;
     }
@@ -33,15 +33,13 @@ public class Node {
 
     public void calculateNodesWeight() {
         for (Edge edge : edges) {
-            if(edge.weight+this.weight< edge.nextNode.weight){
-                edge.nextNode.weight=edge.weight+this.weight;
+            if(edge.weight+this.value < edge.nextNode.value){
+                edge.nextNode.value =edge.weight+this.value;
                 edge.nextNode.previousNode=this;
             }
         }
 
     }
 
-    public void setEdges(ArrayList<Edge> edges) {
-        this.edges = edges;
-    }
+
 }

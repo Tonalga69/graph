@@ -7,8 +7,8 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Buscador de nodos!");
         Scanner scanner = new Scanner(System.in);
-        String startNode = "A";
-        String endNode = "E";
+        String startNode;
+        String endNode;
 
         System.out.println("Por favor, ingrese el nodo de inicio A-F: ");
         startNode=scanner.next();
@@ -34,7 +34,7 @@ public class Main {
         nodes.get("C").addEdge(new Edge(12, nodes.get("E")));
         nodes.get("E").addEdge(new Edge(1, nodes.get("F")));
 
-        nodes.get(startNode).weight = 0;
+        nodes.get(startNode).value = 0;
         String smallestNodeName = startNode;
 
         while (true) {
@@ -62,9 +62,9 @@ public class Main {
         Node smallestNode = null;
         Integer smallestWeight = Integer.MAX_VALUE;
         for (Node node : nodes.values()) {
-            if (!node.isVisited() && (smallestNode == null || node.weight < smallestWeight)) {
+            if (!node.isVisited() && (smallestNode == null || node.value < smallestWeight)) {
                 smallestNode = node;
-                smallestWeight = node.weight;
+                smallestWeight = node.value;
             }
         }
         return smallestNode;
@@ -72,7 +72,7 @@ public class Main {
 
     static void printPath(Map<String, Node> nodes, String endNode) {
         Node node = nodes.get(endNode);
-        System.out.println("El peso total es: " + node.weight);
+        System.out.println("El peso total es: " + node.value);
         System.out.println("El camino más corto es: ");
         while (node != null) {
             System.out.println(node.name + " -> ");
