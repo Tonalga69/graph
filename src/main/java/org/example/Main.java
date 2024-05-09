@@ -1,12 +1,20 @@
 package org.example;
 
 import java.util.Map;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Buscador de nodos!");
+        Scanner scanner = new Scanner(System.in);
         String startNode = "A";
         String endNode = "E";
+
+        System.out.println("Por favor, ingrese el nodo de inicio A-F: ");
+        startNode=scanner.next();
+        System.out.println("Por favor, ingrese el nodo final A-F: ");
+        endNode=scanner.next();
+
 
         Map<String, Node> nodes = Map.of(
                 "A", new Node("A"),
