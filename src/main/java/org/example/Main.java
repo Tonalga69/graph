@@ -1,29 +1,36 @@
 package org.example;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Map;
-import java.util.Scanner;
 
-public class Main {
+public class Main extends JPanel {
+    static String startNode = "A";
+    static String endNode = "E";
+    static String smallestNodeName;
+    static JButton button = new JButton("Press");
+    static boolean isFinished=false;
+
+
+    static Map<String, Node> nodes = Map.of(
+            "A", new Node("A", 50, 75),
+            "B", new Node("B", 250, 50),
+            "C", new Node("C", 250, 150),
+            "D", new Node("D", 50, 200),
+            "E", new Node("E", 550, 250),
+            "F", new Node("F", 550, 50)
+    );
+
     public static void main(String[] args) {
-        System.out.println("Buscador de nodos!");
-        Scanner scanner = new Scanner(System.in);
-        String startNode;
-        String endNode;
+        JFrame frame = new JFrame("Dijkstra");
+        Main main = new Main();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 800);
+        frame.add(main);
+        main.add(button);
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
 
-        System.out.println("Por favor, ingrese el nodo de inicio A-F: ");
-        startNode=scanner.next();
-        System.out.println("Por favor, ingrese el nodo final A-F: ");
-        endNode=scanner.next();
-
-
-        Map<String, Node> nodes = Map.of(
-                "A", new Node("A"),
-                "B", new Node("B"),
-                "C", new Node("C"),
-                "D", new Node("D"),
-                "E", new Node("E"),
-                "F", new Node("F")
-        );
         nodes.get("A").addEdge(new Edge(1, nodes.get("B")));
         nodes.get("A").addEdge(new Edge(6, nodes.get("C")));
         nodes.get("A").addEdge(new Edge(3, nodes.get("D")));
@@ -35,22 +42,70 @@ public class Main {
         nodes.get("E").addEdge(new Edge(1, nodes.get("F")));
 
         nodes.get(startNode).value = 0;
-        String smallestNodeName = startNode;
+        smallestNodeName = startNode;
 
-        while (true) {
-           final boolean res=calculateNodesWeight(nodes, smallestNodeName, endNode);
-           if(res){
-               break;
-           }
-           smallestNodeName =getSmallestNodeNotVisited(nodes).name;
-        }
+        button.addActionListener(e -> {
+            Timer timer = new Timer(2000, null);
+            timer.addActionListener(e1 -> {
+                final boolean res = calculateNodesWeight(nodes, smallestNodeName, endNode);
+                if (res) {
+                    timer.stop();
+                   isFinished=true;
+                   main.repaint();
+                    return;
+                }
+                smallestNodeName = getSmallestNodeNotVisited(nodes).name;
+                main.repaint();
+            });
 
-        printPath(nodes, endNode);
+
+            timer.start();
+
+        });
+
 
     }
 
-    static  boolean calculateNodesWeight(Map<String, Node> nodes, String startNode, String endNode) {
-        if(startNode.equals(endNode)) {
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawString("Start Node: " + startNode, 10, 10);
+        g.drawString("End Node: " + endNode, 10, 30);
+        if(isFinished){
+           paintPath(g);
+           return;
+        }
+        drawNodes(g);
+
+    }
+
+
+
+    private static void drawNodes(Graphics g) {
+        g.setColor(Color.WHITE);
+        g.drawRect(0, 0, 800, 800);
+        g.setColor(Color.BLACK);
+        for (Node node : nodes.values()) {
+            if (node.isVisited()) {
+                g.setColor(Color.RED);
+            }
+            g.fillOval(node.getX(), node.getY(), 30, 30);
+            g.setColor(Color.white);
+            g.drawString(node.name, node.getX() + 10, node.getY() + 15);
+            g.setColor(Color.BLACK);
+            if (node.value != Integer.MAX_VALUE) {
+                g.drawString(String.valueOf(node.value), node.getX() + 15, node.getY() - 15);
+            }
+            for (Edge edge : node.getEdges()) {
+                g.drawLine(node.getX() + 15, node.getY() + 15, edge.nextNode.getX() + 15, edge.nextNode.getY() + 15);
+                g.drawString(String.valueOf(edge.weight), (node.getX() + edge.nextNode.getX()) / 2, (node.getY() + edge.nextNode.getY()) / 2);
+            }
+
+        }
+    }
+
+    static boolean calculateNodesWeight(Map<String, Node> nodes, String startNode, String endNode) {
+        if (startNode.equals(endNode)) {
             return true;
         }
         nodes.get(startNode).setVisited(true);
@@ -70,17 +125,23 @@ public class Main {
         return smallestNode;
     }
 
-    static void printPath(Map<String, Node> nodes, String endNode) {
+    static void paintPath(Graphics g) {
+        drawNodes(g);
         Node node = nodes.get(endNode);
-        System.out.println("El peso total es: " + node.value);
-        System.out.println("El camino más corto es: ");
         while (node != null) {
-            System.out.println(node.name + " -> ");
+            g.setColor(Color.GREEN);
+            g.fillOval(node.getX(), node.getY(), 30, 30);
+            g.setColor(Color.white);
+            g.drawString(node.name, node.getX() + 10, node.getY() + 15);
+            if(node.previousNode==null){
+                break;
+            }
+            g.setColor(Color.GREEN);
+            g.drawLine(node.getX() + 15, node.getY() + 15, node.previousNode.getX() + 15, node.previousNode.getY() + 15);
             node = node.previousNode;
         }
+
     }
-
-
 
 
 }
